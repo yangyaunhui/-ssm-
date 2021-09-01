@@ -10,11 +10,4 @@ public class HelloController {
         System.out.println("请求进入hello.....");
         return "rello";
     }
-
-
-        @RequestMapping("/reg")
-        public String reg(){
-            System.out.println("请求进入reg.....");
-            return "reg";
-        }
 }
