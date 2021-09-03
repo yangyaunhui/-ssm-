@@ -29,4 +29,20 @@ public class PagesController {
     public String loginForm(){
         return "loginForm";
     }
+
+    @RequestMapping("ajaxCommit")
+    public String ajaxCommit(){
+        return "ajaxCommit";
+    }
+
+    @RequestMapping("/homes")
+    public String homes(){
+        System.out.println("请求已经进入controller 层 ");
+        return "homes";
+    }
+
+    @RequestMapping("/home")
+    public String home(){
+        return "home";
+    }
 }

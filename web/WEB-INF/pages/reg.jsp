@@ -110,6 +110,7 @@
             // layer.msg(JSON.stringify(data.field))
             $.ajax({
                 url:'/api/admin/regByBean',
+                //url:'/api/admin/reg',
                 type:'POST',
                 data:data.field,
                 dataType:'json',
@@ -127,7 +128,7 @@
 
                 }
             })
-        })
+        });
 
         //监听指定开关
         form.on('switch(switchTest)', function(data){
@@ -136,7 +137,7 @@
             });
         });
 
-    })
+    });
 </script>
 
 </body>

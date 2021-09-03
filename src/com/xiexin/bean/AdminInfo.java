@@ -2,7 +2,9 @@ package com.xiexin.bean;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class AdminInfo {
     private String adminName;
@@ -11,6 +13,10 @@ public class AdminInfo {
     //因为前端过来的参数是个 字符串，所以 这里要 做个类型转换
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date adminTime;
+
+    private List<Lover> loverList;
+    private Integer[] aiHao;   //1.写代码 2.看书  3.读报纸
+
     private String sex;
     private String hobby;
     private String jiuye;
@@ -23,11 +29,29 @@ public class AdminInfo {
                 ", adminPwd='" + adminPwd + '\'' +
                 ", adminPwdR='" + adminPwdR + '\'' +
                 ", adminTime=" + adminTime +
+                ", loverList=" + loverList +
+                ", aiHao=" + Arrays.toString(aiHao) +
                 ", sex='" + sex + '\'' +
                 ", hobby='" + hobby + '\'' +
                 ", jiuye='" + jiuye + '\'' +
                 ", zhuan='" + zhuan + '\'' +
                 '}';
+    }
+
+    public List<Lover> getLoverList() {
+        return loverList;
+    }
+
+    public void setLoverList(List<Lover> loverList) {
+        this.loverList = loverList;
+    }
+
+    public Integer[] getAiHao() {
+        return aiHao;
+    }
+
+    public void setAiHao(Integer[] aiHao) {
+        this.aiHao = aiHao;
     }
 
     public String getAdminName() {

@@ -1,11 +1,20 @@
 package com.xiexin.controller;
 
 import com.xiexin.bean.AdminInfo;
+import com.xiexin.bean.Dog;
+import com.xiexin.bean.Lover;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -30,9 +39,17 @@ public class AdminController {
     //第一种收参方式:数据类型接收参数!!!!!!
     @RequestMapping("/reg")
     @ResponseBody //这个注解就是返回给前端的json数据
-    public Map reg(String adminName,String adminPwd,String adminPwdR,String adminTime){
+    public Map reg(String adminName, String adminPwd, String adminPwdR, String adminTime,
+                   String sex, ArrayList<String> hobby, String jiuye, String zhuan){
+        System.out.println("adminName = " + adminName);
+        System.out.println("adminPwd = " + adminPwd);
         System.out.println("adminPwdR = " + adminPwdR);
         System.out.println("adminTime = " + adminTime);
+        System.out.println("sex = " + sex);
+        System.out.println("hobby = " + hobby);
+        System.out.println("jiuye = " + jiuye);
+        System.out.println("zhuan = " + zhuan);
+
         Map codeMap = new HashMap();
         if (!adminPwd.equals(adminPwdR)) {
             codeMap.put("code","4401");
@@ -78,4 +95,158 @@ public class AdminController {
         codeMap.put("msg","注册成功");
         return codeMap;
     }
+
+    //ajax03 接收数组、集合
+    @RequestMapping("/ajax03")
+    @ResponseBody
+    public Map ajax03(@RequestParam("ids[]") List<Integer> ids){
+        //前端 ids[]  后台ids  当前后端参数不一致的时候，就需要注解调整@RequestParam("ids[]")
+        for (Integer id : ids) {
+            System.out.println("id = " + id);
+        }
+        Map codeMap = new HashMap();
+        codeMap.put("code",0);
+        codeMap.put("msg","请求访问成功");
+        codeMap.put("data",ids);
+        return codeMap;
+    }
+
+    //ajax04 接收json对象
+    @RequestMapping("/ajax04")
+    @ResponseBody
+    public Map ajax04(@RequestBody AdminInfo adminInfo){  //@RequestBody注解就是指前端json请求
+        System.out.println("adminInfo = " + adminInfo);
+        Map codeMap = new HashMap();
+        codeMap.put("code",0);
+        codeMap.put("msg","请求访问成功");
+        codeMap.put("data",adminInfo);
+        return codeMap;
+    }
+
+    //ajax05接收前端传来的多个对象
+    @RequestMapping("/ajax05")
+    @ResponseBody
+    public Map ajax05(@ModelAttribute Lover lover,@ModelAttribute Dog dog){
+        System.out.println("lover = " + lover);
+        System.out.println("dog = " + dog);
+        Map codeMap = new HashMap();
+        codeMap.put("code",0);
+        codeMap.put("msg","请求访问成功");
+        codeMap.put("data1",lover);
+        codeMap.put("data2",dog);
+        return codeMap;
+    }
+
+    //前端传来的多个对象需要根据请求的前缀进行绑定
+    @InitBinder("lover")
+    public void binding01(WebDataBinder webDataBinder){ //WebDataBinder 网络数据绑定
+        webDataBinder.setFieldDefaultPrefix("lover.");
+    }
+    @InitBinder("dog")
+    public void binding02(WebDataBinder webDataBinder){ //WebDataBinder 网络数据绑定
+        webDataBinder.setFieldDefaultPrefix("dog.");
+    }
+
+    //ajax06 json收取多个对象
+    //@GetMapping
+    @RequestMapping("/ajax06")
+    @ResponseBody   //@RequestBody 和 @GetMapping不能同时使用,拿不到参数
+    public Map ajax06(@RequestBody List<Lover> loverList){//@RequestBody 它是从方法体中拿取的数据的,所以不能和GET请求
+        for (Lover lover : loverList) {
+            System.out.println("loverList = " + loverList);
+        }
+        Map codeMap = new HashMap();
+        codeMap.put("code",0);
+        codeMap.put("msg","请求访问成功");
+        codeMap.put("data",loverList);
+        return codeMap;
+    }
+
+    //ajax07
+    @RequestMapping("/ajax07")
+    @ResponseBody //十分常用 还记得我们servlet多表的动态参数
+    public Map ajax07(@RequestBody Map map){
+        System.out.println("map" + map);
+        Map codeMap = new HashMap();
+        codeMap.put("code",0);
+        codeMap.put("msg","请求访问成功");
+        codeMap.put("data",map);
+        return codeMap;
+    }
+
+    //ajax08
+    @RequestMapping("/ajax08")
+    @ResponseBody
+    public Map ajax08(Lover lover,@RequestParam(value = "limit", required = false,defaultValue = "5") Integer pageSize,Integer page){
+        System.out.println("lover = " + lover);
+        System.out.println("page = " + page);
+        System.out.println("pageSize = " + pageSize);
+        return null;
+    }
+
+    //以上是前后端最新项目用到的知识点,那么也有传统项目,后台负责跳转到另一个界面
+    //第一种SpringMVC的传值方式,原始方式:request+session+request的转发
+    // 传统的mvc的方法(不返回json数据,不使用@ResponseBody),它要跳转jsp,跳转jsp的方式,返回值是String
+    //页面传值:即四大作用域request,session,applation,page
+    @RequestMapping("/yuansheng")//什么页面传值---登录页(admin,123456)---yuansheng()-----(admin) home
+    //public String yuansheng(AdminInfo adminInfo, HttpSession session){
+    public String yuansheng(HttpSession session, HttpServletRequest request){
+        System.out.println("原生方式页面传值");
+        //System.out.println("adminInfo = " + adminInfo);
+        //登录如果验证成功,就需要把登录信息放入到session域中
+        //session.setAttribute("adminInfo",adminInfo);
+
+        String adminName = request.getParameter("adminName");
+        String adminPwd = request.getParameter("adminPwd");
+        request.setAttribute("adminName",adminName);
+        request.setAttribute("adminPwd",adminPwd);
+
+        //request.getRequestDispatcher("home.jsp").forward(request,respones);
+        //servlet的转发
+        //return "home";//这个和PageController里的查找jsp没关系
+        //springmvc的转发
+        //return "forward:/WEB-INF/pages/home.jsp";
+        //return "forward:/pages/home";
+
+        //重定向,servlet response.sendDirect("/www.baidu.com")
+        //return "redirect:https://www.baidu.com";// 带/ 和 不带/ 区别
+        return "redirect:/https://www.baidu.com";// 带/ 和 不带/ 区别  http://localhost:8080/https://www.baidu.com
+    }
+
+    //第二种springmvc的传值方式 modelAndView
+    @RequestMapping("/modelAndView")
+    public ModelAndView modelAndView(AdminInfo adminInfo){
+        //model 模型和视图 通俗的讲,数据和显示 ModelAndView可以代替转发功能,更强大了
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("adminName",adminInfo.getAdminName());
+        mv.addObject("adminPwd",adminInfo.getAdminPwd());
+        System.out.println("以上是model的绑定,即数据的绑定");
+        mv.setViewName("home");
+        return mv;
+    }
+
+    //第三种springmvc的传值方式 model  代码少
+    @RequestMapping("/model")
+    public String model(AdminInfo adminInfo, Model model){
+        model.addAttribute("adminName",adminInfo.getAdminName());
+        model.addAttribute("adminPwd",adminInfo.getAdminPwd());
+        return "home";
+    }
+
+    //第四种springmvc的传值方式!!!modelMap
+    @RequestMapping("/modelMap")
+    public String modelMap(AdminInfo adminInfo, ModelMap modelMap){
+    modelMap.put("adminName",adminInfo.getAdminName());
+    modelMap.put("adminPwd",adminInfo.getAdminPwd());
+    return "home";
+    }
+
+    //第五种springmvc的传值方式!!!map
+    @RequestMapping("/map")
+    public String map(AdminInfo adminInfo,Map<String,Object> map){
+        map.put("adminName",adminInfo.getAdminName());
+        map.put("adminPwd",adminInfo.getAdminPwd());
+        return "home";
+    }
+
 }
